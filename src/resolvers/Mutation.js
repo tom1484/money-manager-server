@@ -4,33 +4,33 @@ const Mutation = {
   async userSignUp(_, { input }, { AppUserModel }, info) {
     const { name, password, email } = input;
 
-    let response = { status: "0" };
-    let appUser = await AppUserModel.findOne({ name }).exec();
-    console.log(appUser);
+    let response = { status: "-1" };
 
-    if (!appUser) {
+    let appUserByName = await AppUserModel.findOne({ name }).exec();
+    let appUserByEmail = await AppUserModel.findOne({ email }).exec();
+
+    if (appUserByName) {
+      response = { status: "0-0" };
+    } else if (appUserByEmail) {
+      response = { status: "0-1" };
+    } else {
       const token = generateToken();
-      appUser = {
+      appUserByName = {
         name,
         password,
         email,
       }
-      await AppUserModel.create({ ...appUser, token })
-        .then((result) => {
-          console.log("Ok");
+      await AppUserModel.create({ ...appUserByName, token })
+        .then(() => {
           response = {
             status: "1",
             token: token,
-            appUser: appUser
+            appUser: appUserByName
           };
         })
-        .catch((error) => {
-          console.log(error);
-          response = { status: "-1" };
-        });
-
-      return response;
     }
+
+    return response;
   },
 };
 
