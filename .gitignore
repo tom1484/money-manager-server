@@ -10,3 +10,6 @@ npm-debug.*
 
 # macOS
 .DS_Store
+
+.env
+data

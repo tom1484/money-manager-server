@@ -1,8 +1,30 @@
-type UserAccount {
-  ID: String
+type AppUser {
   name: String
+  email: String
+}
+
+type UserSignInResponse {
+  status: String
+  token: String
+  appUser: AppUser
 }
 
 type Query {
-  userAccount(ID: String): UserAccount
+  userSignIn(name: String, password: String): UserSignInResponse
+}
+
+input UserSignUpInput {
+  name: String
+  password: String
+  email: String
+}
+
+type UserSignUpResponse {
+  status: String
+  token: String
+  appUser: AppUser
+}
+
+type Mutation {
+  userSignUp(input: UserSignUpInput): UserSignUpResponse
 }

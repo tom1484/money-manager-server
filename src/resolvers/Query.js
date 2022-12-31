@@ -1,8 +1,15 @@
 const Query = {
-    async userAccount(_, { }, { }, info) {
-        console.log("Query In");
-        return { ID: "123", name: "123" };
-    },
+  async userSignIn(_, { name, password }, { }, info) {
+    console.log("Query In");
+    return {
+      status: "1",
+      token: "123123123123",
+      appUser: {
+        name: "Test",
+        email: "Test",
+      }
+    };
+  },
 };
 
 export default Query;
