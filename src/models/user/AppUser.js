@@ -29,6 +29,16 @@ const AppUserSchema = new mongoose.Schema({
         unique: true,
         trim: true,
     },
+    transactionTable: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'TransactionTable',
+        required: true,
+    },
+    accountTable: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'AccountTable',
+        required: true,
+    },
     createdAt: {
         type: Date,
         default: Date.now
@@ -37,4 +47,4 @@ const AppUserSchema = new mongoose.Schema({
 
 const AppUserModel = mongoose.model('AppUser', AppUserSchema);
 
-export default AppUserModel;
+export { AppUserModel as default, AppUserSchema };

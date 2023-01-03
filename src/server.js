@@ -4,12 +4,14 @@ import { WebSocketServer } from 'ws';
 import { createPubSub, createSchema, createYoga } from 'graphql-yoga';
 import { useServer } from 'graphql-ws/lib/use/ws';
 
-import AppUserModel from './models/AppUserModel';
+import { AppUserModel } from '@models/user';
+import { TransactionTableModel } from '@models/transaction';
+import { AccountTableModel } from '@models/account';
 
-import Query from '@resolvers/Query';
-import Mutation from './resolvers/Mutation';
-// import Subscription from './resolvers/Subscription';
-// import ChatRoom from './resolvers/ChatRoom';
+import schema from '@schema';
+
+
+import { Query, Mutation } from '@resolvers';
 
 const pubsub = createPubSub();
 
@@ -20,10 +22,7 @@ const yoga = createYoga({
     credentials: true,
   },
   schema: createSchema({
-    typeDefs: fs.readFileSync(
-      './src/schema.graphql',
-      'utf-8',
-    ),
+    typeDefs: schema,
     resolvers: {
       Query,
       Mutation,
@@ -32,8 +31,10 @@ const yoga = createYoga({
     },
   }),
   context: {
-    AppUserModel,
     pubsub,
+    AppUserModel,
+    TransactionTableModel,
+    AccountTableModel,
   },
 });
 

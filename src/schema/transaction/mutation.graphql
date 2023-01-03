@@ -1,0 +1,5 @@
+type Mutation {
+  createTransaction(input: CreateTransactionInput): CreateTransactionResponse
+  updateTransaction(input: UpdateTransactionInput): UpdateTransactionResponse
+  deleteTransaction(input: DeleteTransactionInput): DeleteTransactionResponse
+}

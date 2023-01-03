@@ -1,4 +1,5 @@
-import generateToken from '../utils/generateToken';
+import { generateToken } from '@utils/common';
+import { createAppUser } from '@utils/authencation';
 
 const Mutation = {
   async userSignUp(_, { input }, { AppUserModel }, info) {
@@ -15,20 +16,23 @@ const Mutation = {
       response = { status: "0-1" };
     } else {
       const token = generateToken();
-      appUserByName = {
+      const appUserInfo = {
         name,
         password,
         email,
+        token,
       }
-      await AppUserModel.create({ ...appUserByName, token })
+      await createAppUser(appUserInfo)
         .then(() => {
           response = {
             status: "1",
             token: token,
-            appUser: appUserByName
+            appUser: appUserInfo
           };
         })
     }
+
+    // console.log(response);
 
     return response;
   },

@@ -9,6 +9,7 @@
           "@src": "./src",
           "@models": "./src/models",
           "@resolvers": "./src/resolvers",
+          "@schema": "./src/schema",
           "@utils": "./src/utils"
         }
       }

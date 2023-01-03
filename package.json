@@ -6,7 +6,7 @@
   "author": "tom1484 <tomchen2003611@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "start": "nodemon src/index.js --ext js --watch src --exec babel-node"
+    "start": "nodemon src/index.js --ext '*' --watch src --exec babel-node"
   },
   "dependencies": {
     "axios": "^1.1.3",

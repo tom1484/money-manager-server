@@ -1,0 +1,5 @@
+type Mutation {
+  createAccount(input: CreateAccountInput): CreateAccountResponse
+  updateAccount(input: UpdateAccountInput): UpdateAccountResponse
+  deleteAccount(input: DeleteAccountInput): DeleteAccountResponse
+}

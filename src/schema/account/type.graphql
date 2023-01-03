@@ -1,0 +1,51 @@
+type accessRecord {
+  date: String!
+  type: String!
+  amount: Float!
+  transaction: Transaction!
+}
+
+type Account {
+  group: String!
+  name: String!
+  accessRecords: [accessRecord]
+  _id: String
+}
+
+type LoadAccountTableResponse {
+  status: String!
+  accounts: [Account]
+}
+
+input CreateAccountInput {
+  token: String!
+  group: String!
+  name: String!
+  deposit: Float!
+}
+
+type CreateAccountResponse {
+  status: String!
+  account: Account
+}
+
+input UpdateAccountInput {
+  token: String!
+  _id: String!
+  group: String
+  name: String
+}
+
+type UpdateAccountResponse {
+  status: String!
+  account: Account
+}
+
+input DeleteAccountInput {
+  token: String!
+  _id: String!
+}
+
+type DeleteAccountResponse {
+  status: String!
+}

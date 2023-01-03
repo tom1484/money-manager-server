@@ -1,0 +1,57 @@
+type Transaction {
+  type: String!
+  date: String!
+  accountSource: String
+  accountDestination: String
+  category: String!
+  amount: Float!
+  description: String
+  _id: String
+}
+
+type LoadTransactionTableResponse {
+  status: String!
+  transactions: [Transaction]
+}
+
+input CreateTransactionInput {
+  token: String!
+  type: String!
+  date: String!
+  accountSource: String
+  accountDestination: String
+  category: String!
+  amount: Float!
+  description: String
+}
+
+type CreateTransactionResponse {
+  status: String!
+  transaction: Transaction
+}
+
+input UpdateTransactionInput {
+  token: String!
+  _id: String!
+  type: String
+  date: String
+  accountSource: String
+  accountDestination: String
+  category: String
+  amount: Float
+  description: String
+}
+
+type UpdateTransactionResponse {
+  status: String!
+  transaction: Transaction
+}
+
+input DeleteTransactionInput {
+  token: String!
+  _id: String!
+}
+
+type DeleteTransactionResponse {
+  status: String!
+}

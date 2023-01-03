@@ -9,10 +9,6 @@ type UserSignInResponse {
   appUser: AppUser
 }
 
-type Query {
-  userSignIn(name: String, password: String): UserSignInResponse
-}
-
 input UserSignUpInput {
   name: String
   password: String
@@ -23,8 +19,4 @@ type UserSignUpResponse {
   status: String
   token: String
   appUser: AppUser
-}
-
-type Mutation {
-  userSignUp(input: UserSignUpInput): UserSignUpResponse
 }
