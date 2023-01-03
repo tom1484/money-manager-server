@@ -52,6 +52,17 @@ const loadTransactions = (transactionTableID, startDate, endDate, filters, filte
   });
 }
 
+const loadTrasactionsByIDs = (transactionIDs) => {
+  return new Promise(async (resolve, reject) => {
+    await TransactionModel.find({ _id: { $in: transactionIDs } })
+      .then((transactions) => {
+        resolve(transactions);
+      }).catch((error) => {
+        reject(error);
+      });
+  });
+};
+
 const addTransaction = (appUser, newTransaction) => {
   return new Promise(async (resolve, reject) => {
     await TransactionModel.create(newTransaction)
@@ -235,6 +246,7 @@ const deleteTransaction = (transactionID) => {
 };
 
 export {
-  addTransaction, loadTransactions,
+  addTransaction,
+  loadTransactions, loadTrasactionsByIDs,
   updateTransaction, deleteTransaction
 };

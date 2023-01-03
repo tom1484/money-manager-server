@@ -7,4 +7,8 @@ type Query {
     filterKeys: [[String]]
     limit: Int
   ): LoadTransactionTableResponse
+  loadTransactionsByIDs(
+    token: String!
+    transactionIDs: [String]
+  ): LoadTransactionsByIDsResponse
 }

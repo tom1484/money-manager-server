@@ -96,12 +96,12 @@ const updateAccountBalance = (accountID, dateRaw) => {
 
 const addAccount = (appUser, newAccount, deposit) => {
   return new Promise(async (resolve, reject) => {
-    const accountTable = await AccountTableModel.findOne({
+    const account = await AccountModel.findOne({
       group: newAccount.group,
       name: newAccount.name,
     }).exec();
 
-    if (accountTable) {
+    if (account) {
       reject();
     } else {
       await AccountModel.create(newAccount)

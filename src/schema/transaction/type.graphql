@@ -14,6 +14,11 @@ type LoadTransactionTableResponse {
   transactions: [Transaction]
 }
 
+type LoadTransactionsByIDsResponse {
+  status: String!
+  transactions: [Transaction]
+}
+
 input CreateTransactionInput {
   token: String!
   type: String!

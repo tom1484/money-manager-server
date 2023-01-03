@@ -1,14 +1,24 @@
-type accessRecord {
+type AccessRecord {
   date: String!
   type: String!
   amount: Float!
-  transaction: Transaction!
+  transaction: String!
+}
+
+type Balance {
+  year: Int!
+  month: Int!
+  day: Int!
+  deposit: Float!
+  withdrawal: Float!
+  balance: Float!
 }
 
 type Account {
   group: String!
   name: String!
-  accessRecords: [accessRecord]
+  balances: [Balance]
+  accessRecords: [AccessRecord]
   _id: String
 }
 
