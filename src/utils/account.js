@@ -1,7 +1,7 @@
 import { Types } from 'mongoose';
 import { AccountTableModel, AccountModel } from '@models/account';
 
-import { addTransaction } from '@utils/transaction';
+import { addTransaction, deleteTransaction } from '@utils/transaction';
 
 const loadAccounts = (accountTableID) => {
   return new Promise(async (resolve, reject) => {
@@ -29,7 +29,7 @@ const updateAccountBalance = (accountID, dateRaw) => {
 
     const account = await AccountModel.findOne({ _id: accountID }).exec();
     if (!account) {
-      reject();
+      reject({ status: "0" });
     }
 
     const accessRecords = account.accessRecords.filter((accessRecord) => {
@@ -70,7 +70,7 @@ const updateAccountBalance = (accountID, dateRaw) => {
         }
       ).then((updateResponse) => {
         if (!updateResponse.acknowledged) {
-          reject();
+          reject({ status: "-1" });
         }
       });
     } else {
@@ -84,7 +84,7 @@ const updateAccountBalance = (accountID, dateRaw) => {
         { arrayFilters: [{ "balance._id": balance._id }] }
       ).then((updateResponse) => {
         if (!updateResponse.acknowledged) {
-          reject();
+          reject({ status: "-1" });
         }
       });
     }
@@ -97,30 +97,30 @@ const updateAccountBalance = (accountID, dateRaw) => {
 const addAccount = (appUser, newAccount, deposit) => {
   return new Promise(async (resolve, reject) => {
     const account = await AccountModel.findOne({
-      group: newAccount.group,
+      // group: newAccount.group,
       name: newAccount.name,
     }).exec();
 
     if (account) {
-      reject();
+      reject({ status: "0" });
     } else {
       await AccountModel.create(newAccount)
         .catch((error) => {
-          reject(error);
+          reject({ status: "-1" });
         });
 
       await AccountTableModel.updateOne(
         { _id: appUser.accountTable }, { $push: { accounts: newAccount._id } }
       ).then((updateResponse) => {
         if (!updateResponse.acknowledged) {
-          reject();
+          reject({ status: "-1" });
         }
       });
 
       await addTransaction(appUser, {
         type: "INCOME", date: new Date(),
         accountDestination: newAccount._id,
-        category: "Initial", amount: deposit,
+        category: "INITIAL", amount: deposit,
         description: "Initial deposit",
         _id: new Types.ObjectId(),
       });
@@ -157,19 +157,27 @@ const updateAccount = (accountID, newAccountInfo) => {
 
 const deleteAccount = (accountID) => {
   return new Promise(async (resolve, reject) => {
-    await AccountModel.deleteOne({ _id: accountID })
-      .then((deleteResponse) => {
-        if (!deleteResponse.acknowledged) {
-          reject();
-        } else {
-          resolve();
-        }
-      }).catch((error) => {
-        reject(error);
-      });
+    const account = await AccountModel.findOne({ _id: accountID }).exec();
+    if (!account) {
+      reject();
+    } else {
+      for (let accessRecord of account.accessRecords) {
+        await deleteTransaction(accessRecord.transaction)
+          .then(() => {
+            console.log("delete transaction");
+          })
+          .catch((error) => {
+            reject(error);
+          });
+      }
 
-    // TODO delete all transactions related to this account
-    // TODO update all balances related those deleted transactions
+      await AccountModel.findOneAndDelete({ _id: account._id })
+        .exec().catch((error) => {
+          reject(error);
+        });
+
+      resolve();
+    }
   });
 };
 

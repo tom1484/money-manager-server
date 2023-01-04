@@ -24,7 +24,7 @@ const Mutation = {
             account: newAccount,
           };
         }).catch((err) => {
-          // console.log(err);
+          response = { status: err.status };
         });
     }
 
@@ -55,6 +55,7 @@ const Mutation = {
 
     return response;
   },
+
   async deleteAccount(_, { input }, { AppUserModel }, __) {
     const { token, _id } = input;
 
