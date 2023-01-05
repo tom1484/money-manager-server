@@ -27,6 +27,8 @@ const updateAccountBalance = (accountID, dateRaw) => {
     const month = date.getMonth();
     const day = date.getDate();
 
+    // console.log(dateRaw);
+
     const account = await AccountModel.findOne({ _id: accountID }).exec();
     if (!account) {
       reject({ status: "0" });
@@ -40,55 +42,75 @@ const updateAccountBalance = (accountID, dateRaw) => {
       return accessRecordYear === year && accessRecordMonth === month && accessRecordDay === day;
     })
 
-    let deposit = 0;
-    let withdrawal = 0;
-
-    for (let accessRecord of accessRecords) {
-      if (accessRecord.type === "SOURCE") {
-        withdrawal += accessRecord.amount;
-      } else if (accessRecord.type === "DESTINATION") {
-        deposit += accessRecord.amount;
-      }
-    }
-
     const balance = account.balances.find((balance) => {
       return balance.year === year && balance.month === month && balance.day === day;
     });
 
-    const newBalance = {
-      year, month, day,
-      deposit, withdrawal,
-      balance: deposit - withdrawal,
-    };
-    if (!balance) {
-      await AccountModel.updateOne(
-        { _id: accountID },
-        {
-          $push: {
-            balances: newBalance,
-          }
-        }
-      ).then((updateResponse) => {
-        if (!updateResponse.acknowledged) {
-          reject({ status: "-1" });
-        }
-      });
-    } else {
-      await AccountModel.updateOne(
-        { _id: accountID },
-        {
-          $set: {
-            "balances.$[balance]": newBalance,
-          }
-        },
-        { arrayFilters: [{ "balance._id": balance._id }] }
-      ).then((updateResponse) => {
-        if (!updateResponse.acknowledged) {
-          reject({ status: "-1" });
-        }
-      });
-    }
+    if (accessRecords.length > 0) {
+      let deposit = 0;
+      let withdrawal = 0;
 
+      for (let accessRecord of accessRecords) {
+        if (accessRecord.type === "SOURCE") {
+          withdrawal += accessRecord.amount;
+        } else if (accessRecord.type === "DESTINATION") {
+          deposit += accessRecord.amount;
+        }
+      }
+
+      const newBalance = {
+        year, month, day,
+        deposit, withdrawal,
+        balance: deposit - withdrawal,
+      };
+      if (!balance) {
+        await AccountModel.updateOne(
+          { _id: accountID },
+          {
+            $push: {
+              balances: newBalance,
+            }
+          }
+        ).then((updateResponse) => {
+          if (!updateResponse.acknowledged) {
+            reject({ status: "-1" });
+          }
+        });
+      } else {
+        await AccountModel.updateOne(
+          { _id: accountID },
+          {
+            $set: {
+              "balances.$[balance]": newBalance,
+            }
+          },
+          { arrayFilters: [{ "balance._id": balance._id }] }
+        ).then((updateResponse) => {
+          if (!updateResponse.acknowledged) {
+            reject({ status: "-1" });
+          }
+        });
+      }
+    } else {
+      if (balance) {
+        await AccountModel.updateOne(
+          { _id: accountID },
+          {
+            $pull: {
+              balances: { _id: balance._id },
+            }
+          }
+        ).then((updateResponse) => {
+          if (!updateResponse.acknowledged) {
+            reject({ status: "-1" });
+          } else {
+            console.log("delete balance");
+          }
+        }).catch((error) => {
+          reject(error);
+        });
+      }
+    }
 
     resolve();
   });
@@ -205,6 +227,31 @@ const addAccessRecord = (accountID, type, newTransaction) => {
   });
 };
 
+const updateAccessRecord = (accountID, transactionID, newTransaction) => {
+  return new Promise(async (resolve, reject) => {
+    const { date, amount } = newTransaction;
+    console.log(newTransaction);
+    await AccountModel.updateOne(
+      { _id: accountID },
+      {
+        $set: {
+          "accessRecords.$[accessRecord].date": date,
+          "accessRecords.$[accessRecord].amount": amount,
+        }
+      },
+      { arrayFilters: [{ "accessRecord.transaction": transactionID }] }
+    ).then((updateResponse) => {
+      if (!updateResponse.acknowledged) {
+        reject();
+      } else {
+        resolve();
+      }
+    }).catch((error) => {
+      reject(error);
+    });
+  });
+}
+
 // Used when deleting a transaction
 const deleteAccessRecord = (accountID, transactionID) => {
   return new Promise(async (resolve, reject) => {
@@ -226,5 +273,5 @@ export {
   loadAccounts,
   updateAccountBalance,
   addAccount, updateAccount, deleteAccount,
-  addAccessRecord, deleteAccessRecord,
+  addAccessRecord, updateAccessRecord, deleteAccessRecord,
 };

@@ -45,6 +45,8 @@ const Mutation = {
       category, amount, description
     } = input;
 
+    // console.log(input);
+
     let response = {
       status: "-1",
     }
@@ -66,6 +68,8 @@ const Mutation = {
       }).catch((err) => {
         // console.log(err);
       });
+
+
     }
 
     return response;

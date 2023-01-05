@@ -1,6 +1,7 @@
 import { TransactionTableModel, TransactionModel } from '@models/transaction';
 
 import { addAccessRecord, updateAccountBalance, deleteAccessRecord } from '@utils/account';
+import { updateAccessRecord } from './account';
 
 const loadTransactions = (transactionTableID, startDate, endDate, filters, filterKeys) => {
 
@@ -138,6 +139,9 @@ const updateTransaction = (transactionID, newTransactionInfo) => {
     }
     updateRule.$set.description = newTransactionInfo.description;
 
+    console.log(updateRule);
+
+
     const transaction = await TransactionModel.findOneAndUpdate(
       { _id: transactionID },
       updateRule, { new: false }
@@ -147,8 +151,8 @@ const updateTransaction = (transactionID, newTransactionInfo) => {
     if (!transaction) {
       reject();
     } else {
-      console.log(newTransactionInfo);
-      console.log(transaction);
+      // console.log(newTransactionInfo);
+      // console.log(transaction);
       if (transaction.accountSource !== newTransactionInfo.accountSource) {
         if (transaction.accountSource) {
           await deleteAccessRecord(transaction.accountSource, transactionID)
@@ -169,6 +173,21 @@ const updateTransaction = (transactionID, newTransactionInfo) => {
             });
 
           await updateAccountBalance(newTransactionInfo.accountSource, transaction.date)
+            .catch((error) => {
+              reject(error);
+            });
+        }
+      } else {
+        if (transaction.accountSource) {
+          await updateAccessRecord(transaction.accountSource, transactionID, newTransactionInfo)
+            .catch((error) => {
+              reject(error);
+            });
+          await updateAccountBalance(transaction.accountSource, transaction.date)
+            .catch((error) => {
+              reject(error);
+            });
+          await updateAccountBalance(transaction.accountSource, newTransactionInfo.date)
             .catch((error) => {
               reject(error);
             });
@@ -195,6 +214,21 @@ const updateTransaction = (transactionID, newTransactionInfo) => {
             });
 
           await updateAccountBalance(newTransactionInfo.accountDestination, transaction.date)
+            .catch((error) => {
+              reject(error);
+            });
+        }
+      } else {
+        if (transaction.accountDestination) {
+          await updateAccessRecord(transaction.accountDestination, transactionID, newTransactionInfo)
+            .catch((error) => {
+              reject(error);
+            });
+          await updateAccountBalance(transaction.accountDestination, transaction.date)
+            .catch((error) => {
+              reject(error);
+            });
+          await updateAccountBalance(transaction.accountDestination, newTransactionInfo.date)
             .catch((error) => {
               reject(error);
             });

@@ -1,6 +1,8 @@
 import server from './server';
 import mongo from './mongo';
 
+import dotenv from 'dotenv-defaults';
+dotenv.config();
 
 mongo.connect();
 
