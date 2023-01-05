@@ -4,7 +4,7 @@ const Query = {
   async userSignIn(_, { name, password }, { AppUserModel }, info) {
     let response = { status: "-1" };
     const appUser = await AppUserModel.findOne({ name, password }).exec();
-    // console.log(appUser)
+    console.log(appUser)
 
     if (appUser) {
       const token = generateToken();
