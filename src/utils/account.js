@@ -123,7 +123,14 @@ const addAccount = (appUser, newAccount, deposit) => {
       name: newAccount.name,
     }).exec();
 
+    let accountTable = null;
     if (account) {
+      accountTable = await AccountTableModel.findOne({
+        accounts: { $all: [account._id] }
+      }).exec();
+    }
+
+    if (accountTable) {
       reject({ status: "0" });
     } else {
       await AccountModel.create(newAccount)
