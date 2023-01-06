@@ -126,7 +126,7 @@ const addAccount = (appUser, newAccount, deposit) => {
     let accountTable = null;
     if (account) {
       accountTable = await AccountTableModel.findOne({
-        accounts: { $all: [account._id] }
+        _id: appUser.accountTable, accounts: { $all: [account._id] }
       }).exec();
     }
 
